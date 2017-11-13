@@ -12,13 +12,12 @@ from skimage.morphology import watershed
 from skimage.feature import peak_local_max
 from skimage.measure import regionprops
 
-
 #Import  Read H5 file
 f = h5.File("051319_scan2d_Hillary_NVsearch_scan5_focus=52.2um_zrel=1.5_um.hdf5", "r")
 x, y, image = f['x'], f['y'], f['countrate']
 
-#image = np.array(image, dtype = np.uint16)
 image = np.array(image)
+
 
 def gaussian_laplace(image):
     image =  image - ndimage.gaussian_laplace(image, sigma=3)
@@ -34,11 +33,8 @@ def max_filter(image,size=5):
     filtered_image = ndimage.maximum_filter(image,size)
     return filtered_image
 
+
 def binarize(image):
-    """
-    Input : image (2d array)
-    Output: Masked image where all values below the mean of the image are set to 0
-    """
     
     #Calculate the mean of the image and mask the array to remove all values below
     image_mean = np.mean(image)
@@ -85,7 +81,7 @@ b_image = binarize(image)
 labeled_image = label_image(b_image)
 blob_size = determine_blob_size(labeled_image[0])
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 15))
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 15))
 
 ax1.imshow(b_image, cmap='gray')
 ax1.set_title('blobs', size=20)
@@ -99,5 +95,8 @@ ax2.set_title('labelled blobs', size=20)
 x, y = zip(*labeled_image[2])  # unzip the pairs (x, y) into two lists
 #ax2.scatter(y, x)  # invert the coordinates, as we are talking about row/column indices now
 
-
+sort = np.sort(blob_size)
+sort = sort[9000:-3]
+sort = sort
+ax3.plot(np.arange(1, len(sort)+1), sort)
 
