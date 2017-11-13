@@ -2,6 +2,7 @@
 
 import numpy as np
 from scipy.ndimage import generate_binary_structure
+import scipy.ndimage
 
 
 def remove_small_values(image):
@@ -52,5 +53,23 @@ def labeler(image, do_plot = False):
         ax2.scatter(y, x)  # invert the coordinates, as we are talking about row/column indices now
 
     return x, y
+
+def size_features(image):
+    """
+    A function that outputs an array with pixel sizes of labeled features.
+    Input:
+        image (np.ndarray): an image array with boolean values.
+    Output:
+        sizes (np.ndarray): an array with the sizes of labeled features
+        (in units of pixels)
+    """
+
+    s = generate_binary_structure(2,2)
+
+    labeled_blobs, n_features = ndimage.label(image, structure = s) 
+
+    sizes = scipy.ndimage.measurements.sum(image, labeled_blobs, index = range(n_features))
+
+    return sizes
 
 
